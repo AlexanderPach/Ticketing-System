@@ -106,3 +106,31 @@ exports.currentUser = asyncHandler(async(req, res) => {
     };
     res.json(currentUser);
 })
+
+exports.deleteUser = asyncHandler(async(req, res) => {
+    const {email, password} = req.body;
+
+    const userDeleting = await User.findOne({email});
+    const deletedUser = await userDeleting.delete();
+
+    try{
+    if(!deletedUser){
+        res.status(400).json({
+            success: false,
+            message: `User not found`,
+        });
+    } else{
+        res.status(200).json({
+            deletedUser,
+            success: true,
+            message:`User ${userDeleting._id} has been succesfully deleted`,
+        });
+    }}catch(error){
+        res.status(400).json({
+            success: false,
+            message: `Problem when retrieving deleted user information`,
+        });
+    }
+
+    
+})

@@ -16,7 +16,6 @@ const useRouter = AsyncHandler(async(req,res, next) => {
         try {
             userToken = req.headers.authorization.split(' ')[1];
             const decodedUserToken = jwt.verify(userToken, secret);
-            console.log(`decoded if true ${decodedUserToken}`);
             req.user = await User.findById(decodedUserToken.userId).select(
               '-password'
             );

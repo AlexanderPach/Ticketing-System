@@ -5,8 +5,8 @@ const {
     getUsersById,
     createUsers,
     loginUser,
-    //create a endpoint the saves currently logged in user
-    //the currently logged in user will have the authentication working
+    currentUser,
+    deleteUser
 
 } = require ('../controller/userController');
 
@@ -14,7 +14,9 @@ const useRouter = require('../middleware/authorizationMiddleware');
 
 router.get('/allusers', getAllUsers);
 router.get('/:id', useRouter, getUsersById);
+router.get('/current', currentUser)
 router.post('/user',createUsers);
 router.post('/login', loginUser);
+router.delete('/delete', deleteUser);
 
 module.exports = router;

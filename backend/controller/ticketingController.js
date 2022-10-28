@@ -2,8 +2,6 @@ const asyncHandler = require('express-async-handler')
 
 const Ticket = require('../models/Ticket_Model');
 
-const isValidObject = require('../jwt/validIDObject');
-
 exports.getAllTickets = asyncHandler(async(req, res) => {
     const user = await User.findById(req.user.id);
 
