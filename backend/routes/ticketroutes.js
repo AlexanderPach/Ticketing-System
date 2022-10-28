@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const jwtstuff = require('../jwt/jwtGeneration')
+const middleware = require('../middleware/authorizationMiddleware');
+
 
 const {
     getAllTickets,
@@ -9,7 +12,7 @@ const {
 
 router.get('/', getAllTickets);
 router.get('/:id', getTicketById);
-router.post('/',createTicket);
+router.post('/',middleware,createTicket);
 
 
 module.exports = router;

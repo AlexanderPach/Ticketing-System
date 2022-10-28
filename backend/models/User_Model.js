@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 
 const userSchema = mongoose.Schema(
     {
-        // id:{
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     required: true,
-        // },
         name: {
             type: String,
             required: [true, 'Please add a name'],
@@ -27,6 +25,12 @@ const userSchema = mongoose.Schema(
 
     }
 );
+
+// exports.matchPass = async (pass) =>{
+//     return await bcrypt.compare(pass, this.password);
+// }
+
+
 
 module.exports = mongoose.model('User', userSchema);
 

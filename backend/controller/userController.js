@@ -1,11 +1,12 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/User_Model');
+// const jwtgen = require('../jwt/jwtGenerate');
+const jwtstuff = require('../jwt/jwtGeneration');
+const bcrypt = require('bcryptjs');
 
-const isValidObject = require('../jwt/validIDObject');
-const Ticket_Model = require('../models/Ticket_Model');
 
 exports.getAllUsers = asyncHandler(async(req,res) => {
-    const users = await User.find({});
+    const users = await User.find({}); //mongoose uses empty brackets to search for all 
 
     if(!users){
         res.status(400).json({
@@ -44,18 +45,64 @@ exports.createUsers = asyncHandler(async (req, res) => {
    const {name, email, password, team} = req.body;
    if(!name || !email || !password || !team){
     res.status(400);
-    throw new Error('Wrong Information, Please add appropriate data');
+    throw new Error('Missing Information, Please add appropriate data');
    }
 
-   const ticket = await User.create({
+   const ifUserExist = await User.findOne({email});
+
+   if(ifUserExist){
+    res.status(400);
+    throw new Error('Account Already Exists')
+   }
+
+   const salter = await bcrypt.genSalt(12); 
+   const hashedPass = await bcrypt.hash(password, salter);
+ 
+
+   const newUser = await User.create({
     name,
     email,
-    password,
+    password: hashedPass,
     team,
 
    })
 
-   res.status(201).json(ticket);
-    
+   res.status(201).json({
+    _id: newUser._id,
+    name: newUser.name,
+    team: newUser.team,
+    password: newUser.password,
+    token: jwtstuff.generateToken(newUser._id)
 
+});
+
+})
+
+
+exports.loginUser = asyncHandler(async(req, res) => {
+    const {email, password} = req.body;
+
+    const userLogging = await User.findOne({email});
+
+    if(!userLogging || !(await bcrypt.compare(password, userLogging.password))){
+        res.status(400);
+        console.log(password, userLogging.password);
+        throw new Error(`Invalid username/password : Password -> ${userLogging.password}`);
+    }else{
+        res.status(200).json({
+            _id: userLogging._id,
+            name: userLogging.name,
+            email: userLogging.email,
+            token: jwtstuff.generateToken(userLogging._id),
+        });
+    }
+})
+
+exports.currentUser = asyncHandler(async(req, res) => {
+    const currentUser = {
+        name: req.user.name,
+        email: req.user.email,
+        team: req.user.team,
+    };
+    res.json(currentUser);
 })
